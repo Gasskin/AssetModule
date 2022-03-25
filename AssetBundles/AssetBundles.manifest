@@ -1,0 +1,7 @@
+ManifestFileVersion: 0
+CRC: 2388660422
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: test/model.ab
+      Dependencies: {}
