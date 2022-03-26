@@ -1,7 +1,15 @@
 ManifestFileVersion: 0
-CRC: 2388660422
+CRC: 780095317
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
-      Name: test/model.ab
+      Name: cube
+      Dependencies:
+        Dependency_0: share
+    Info_1:
+      Name: sphere
+      Dependencies:
+        Dependency_0: share
+    Info_2:
+      Name: share
       Dependencies: {}

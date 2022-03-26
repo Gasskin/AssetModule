@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 4199684828
+CRC: 2481143786
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 83fb8e8541ecfc79c35920ef70998b2f
+    Hash: f6b0d3141cb98beaa69b9193789689db
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 7daa2922420b84720b5081a26bac0dba
+    Hash: 7f8ec55d5fb724d4d0b863bbf950e92d
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -17,21 +17,14 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 23
   Script: {instanceID: 0}
-- Class: 28
-  Script: {instanceID: 0}
 - Class: 33
   Script: {instanceID: 0}
 - Class: 43
   Script: {instanceID: 0}
-- Class: 48
-  Script: {instanceID: 0}
-- Class: 90
-  Script: {instanceID: 0}
-- Class: 95
-  Script: {instanceID: 0}
-- Class: 137
+- Class: 135
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/GameData/Prefab/Attack.prefab
-Dependencies: []
+- Assets/GameData/Prefab/Sphere.prefab
+Dependencies:
+- D:/__Project/Unity/AssetModule/AssetBundles/share
