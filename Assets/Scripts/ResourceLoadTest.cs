@@ -7,14 +7,10 @@ public class ResourceLoadTest : MonoBehaviour
 {
     void Start()
     {
-        var mainFestAB = AssetBundle.LoadFromFile("AssetBundles/AssetBundles");
-        var mainFest = mainFestAB.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-
-        var deps = mainFest.GetAllDependencies("cube");
-        foreach (var dep in deps)
-            AssetBundle.LoadFromFile($"AssetBundles/{dep}");
-
-        var cube = AssetBundle.LoadFromFile("AssetBundles/cube");
-        Instantiate(cube.LoadAsset<GameObject>("Cube"));
+        Debug.Log("1");
+        Debug.Log("1,2");
+        Debug.Log("1,2,3");
+        Debug.Log("1,2,3,4");
+        Debug.Log("1,2,3,4,5");
     }
 }

@@ -1,24 +1,40 @@
 using System.IO;
 using UnityEditor;
+using UnityEngine;
 
 public class Build 
 {
     [MenuItem("Tools/打包")]
     public static void BuildAB()
     {
-        if (Directory.Exists("AssetBundles"))
+        var guid = AssetDatabase.FindAssets("AssetBundleBuildConfig");
+        // 说明没有配置表
+        if (guid == null || guid.Length <= 1)
         {
-            var info = new DirectoryInfo("AssetBundles");
-            var all = info.GetDirectories();
-            foreach (var child in all)
-                child.Delete(true);
-            info.Delete(true);
+            Debug.LogError("没有创建打包配置文件");
         }
         else
         {
-            Directory.CreateDirectory("AssetBundles");
-        }        
-        
-        BuildPipeline.BuildAssetBundles("AssetBundles", BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows64);
+            for (int i = 0; i < guid.Length; i++)
+            {
+                if (AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GUIDToAssetPath(guid[i])) != typeof(AssetBundleBuildConfig))
+                    continue;
+                var asset = AssetDatabase.LoadAssetAtPath<AssetBundleBuildConfig>(AssetDatabase.GUIDToAssetPath(guid[i]));
+
+                foreach (var path in asset.prefabList)
+                {
+                    var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
+                    for (int j = 0; j < files.Length; j++)
+                    {
+                        Debug.Log(files[j]);
+                    }
+                }
+
+                foreach (var path in asset.assetList)
+                {
+                    Debug.Log(path);
+                }
+            }
+        }
     }
 }

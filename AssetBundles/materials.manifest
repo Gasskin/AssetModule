@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2315016007
+CRC: 1761080262
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: b65e07742bf2ff6b6d47947f6cd48141
+    Hash: 85f7505c7588507597250bf9354a461b
   TypeTreeHash:
     serializedVersion: 2
     Hash: 939e20ecac0e95a3f7c5cfb3e57acb1d
@@ -17,6 +17,8 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
+- Assets/GameData/Materials/New Material.mat
 - Assets/GameData/Materials/Wood texture floor_01.png
 - Assets/GameData/Materials/Wood texture floor_01.mat
+- Assets/GameData/Materials/Wood texture floor_02.png
 Dependencies: []
