@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestXML xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <id>1</id>
+  <test>
+    <name>999</name>
+  </test>
+  <list>
+    <int>2</int>
+    <int>3</int>
+  </list>
+</TestXML>

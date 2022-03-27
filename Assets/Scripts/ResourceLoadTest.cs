@@ -1,16 +1,19 @@
-using System.Collections;
 using System.IO;
+using System.Xml.Serialization;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class ResourceLoadTest : MonoBehaviour
 {
     void Start()
     {
-        Debug.Log("1");
-        Debug.Log("1,2");
-        Debug.Log("1,2,3");
-        Debug.Log("1,2,3,4");
-        Debug.Log("1,2,3,4,5");
+        using (var stream = new FileStream("AssetBundles/test.xml", FileMode.OpenOrCreate, FileAccess.ReadWrite)) 
+        {
+            var xmlSerializer = new XmlSerializer(typeof(TestXML));
+            var instance = xmlSerializer.Deserialize(stream) as TestXML;
+
+            Debug.Log(instance.id);
+            Debug.Log(instance.test.name);
+        }
     }
 }
+
