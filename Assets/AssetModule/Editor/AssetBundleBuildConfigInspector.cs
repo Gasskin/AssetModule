@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml.Serialization;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -122,6 +124,8 @@ public class AssetBundleBuildConfigInspector : Editor
     private Dictionary<string, List<string>> prefabBundles = new Dictionary<string, List<string>>();
     // 过滤
     private List<string> filter = new List<string>();
+    // XML的过滤
+    private List<string> xmlFilter = new List<string>();
 
     private void Build()
     {
@@ -131,6 +135,7 @@ public class AssetBundleBuildConfigInspector : Editor
             folderBundles.Clear();
             prefabBundles.Clear();
             filter.Clear();
+            xmlFilter.Clear();
             
             // 所有资源
             for (int i = 0; i < script.assetList.Count; i++)
@@ -141,6 +146,7 @@ public class AssetBundleBuildConfigInspector : Editor
                 {
                     folderBundles.Add(bundleName, path);
                     filter.Add(path);
+                    xmlFilter.Add(path);
                 }
                 else
                 {
@@ -154,6 +160,7 @@ public class AssetBundleBuildConfigInspector : Editor
                 var path = AssetDatabase.GUIDToAssetPath(allFolderAssetGUID[i]);
                 var bundleName = path.Substring(path.LastIndexOf("/") + 1);
                 bundleName = bundleName.Substring(0, bundleName.Length - 7);
+                xmlFilter.Add(path);
                 
                 var depend = AssetDatabase.GetDependencies(path);
                 var tempDepend = new List<string>();
@@ -177,7 +184,65 @@ public class AssetBundleBuildConfigInspector : Editor
             foreach (var bundle in prefabBundles)
                 SetBundle(bundle.Key,bundle.Value);
 
+            BuildXML();
             BuildBundle();
+        }
+    }
+
+    private void BuildXML()
+    {
+        // 所有的BundleName
+        var bundleNames = AssetDatabase.GetAllAssetBundleNames();
+        // 资源路径：资源所属Bundle
+        var assetInBundle = new Dictionary<string, string>();
+        for (int i = 0; i < bundleNames.Length; i++)
+        {
+            // 某一个Bundle下所有的资源路径
+            var assetPath = AssetDatabase.GetAssetPathsFromAssetBundle(bundleNames[i]);
+            for (int j = 0; j < assetPath.Length; j++)
+            {
+                if (assetPath[j].EndsWith(".cs") || !IsValidPath(assetPath[j])) 
+                    continue;
+                assetInBundle.Add(assetPath[j],bundleNames[i]);
+            }
+        }
+        
+        AssetBundleConfig config = new AssetBundleConfig();
+        config.bundleList = new List<AssetConfig>();
+        foreach (var assetInfo in assetInBundle)
+        {
+            var asset = new AssetConfig();
+            asset.crc = CRC32.GetCRC32(assetInfo.Key);
+            asset.bundleName = assetInfo.Value;
+            asset.assetName = assetInfo.Key.Remove(0, assetInfo.Key.LastIndexOf("/", StringComparison.Ordinal) + 1);
+            asset.dependence = new List<string>();
+
+            var tempDep = AssetDatabase.GetDependencies(assetInfo.Key);
+            for (int i = 0; i < tempDep.Length; i++)
+            {
+                if (tempDep[i] == assetInfo.Key || tempDep[i].EndsWith(".cs")) 
+                    continue;
+                if (assetInBundle.TryGetValue(tempDep[i],out var depBundle))
+                {
+                    if (depBundle == assetInfo.Value)
+                        continue;
+                    if (!asset.dependence.Contains(depBundle))
+                        asset.dependence.Add(depBundle);
+                }
+            }
+            config.bundleList.Add(asset);
+        }
+
+        var xmlPath = Application.dataPath + "/" + "Resources/AssetBundleConfig.xml";
+        if (File.Exists(xmlPath)) 
+            File.Delete(xmlPath);
+        using (var stream = new FileStream(xmlPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+        {
+            using (var writer = new StreamWriter(stream, Encoding.UTF8))
+            {
+                var xs = new XmlSerializer(typeof(AssetBundleConfig));
+                xs.Serialize(writer, config);
+            }
         }
     }
 
@@ -207,9 +272,20 @@ public class AssetBundleBuildConfigInspector : Editor
     {
         for (int i = 0; i < filter.Count; i++)
         {
-            if (path == filter[i] || path.Contains(filter[i]))
+            if (path == filter[i] || (path.Contains(filter[i]) && path.Replace(filter[i], "")[0] == '/')) 
                 return true;
         }
+        return false;
+    }
+
+    private bool IsValidPath(string path)
+    {
+        for (int i = 0; i < xmlFilter.Count; i++)
+        {
+            if (path.Contains(xmlFilter[i]))
+                return true;
+        }
+
         return false;
     }
 
@@ -222,5 +298,3 @@ public class AssetBundleBuildConfigInspector : Editor
 #endregion
 }
 
-
-      

@@ -6,13 +6,25 @@ public class ResourceLoadTest : MonoBehaviour
 {
     void Start()
     {
-        using (var stream = new FileStream("AssetBundles/test.xml", FileMode.OpenOrCreate, FileAccess.ReadWrite)) 
+        using (var stream = new FileStream($"{Application.dataPath}/Resources/AssetBundleConfig.xml", FileMode.OpenOrCreate, FileAccess.ReadWrite)) 
         {
-            var xmlSerializer = new XmlSerializer(typeof(TestXML));
-            var instance = xmlSerializer.Deserialize(stream) as TestXML;
+            var xmlSerializer = new XmlSerializer(typeof(AssetBundleConfig));
+            var instance = xmlSerializer.Deserialize(stream) as AssetBundleConfig;
 
-            Debug.Log(instance.id);
-            Debug.Log(instance.test.name);
+            var path = "Assets/GameData/Prefab/Cube.prefab";
+            var crc = CRC32.GetCRC32(path);
+            foreach (var assetConfig in instance.bundleList)
+            {
+                if (crc == assetConfig.crc) 
+                {
+                    for (int i = 0; i < assetConfig.dependence.Count; i++)
+                        AssetBundle.LoadFromFile($"AssetBundles/{assetConfig.dependence[i]}");
+                    var ab = AssetBundle.LoadFromFile($"AssetBundles/{assetConfig.bundleName}");
+                    var go = ab.LoadAsset<GameObject>(assetConfig.assetName);
+                    Instantiate(go);
+                    break;
+                }
+            }
         }
     }
 }
