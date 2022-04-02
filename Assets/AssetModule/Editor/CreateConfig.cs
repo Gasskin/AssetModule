@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,30 +7,24 @@ public class CreateConfig
     [MenuItem("Assets/Create/AssetModule/Create Config")]
     private static void Create()
     {
-        var guid = AssetDatabase.FindAssets("AssetBundleBuildConfig");
+        var config = Resources.Load<AssetBundleBuildConfig>("AssetBundleBuildConfig");
         // 说明没有配置表
-        if (guid == null || guid.Length <= 1)
+        if (config == null)
         {
-            var savePath = Selection.activeObject == null
-                ? "Assets/AssetBundleBuildConfig.asset"
-                : $"{AssetDatabase.GetAssetPath(Selection.activeObject)}/AssetBundleBuildConfig.asset";
-
+            if (!Directory.Exists("Assets/Resources"))
+                Directory.CreateDirectory("Assets/Resources");
             var asset = ScriptableObject.CreateInstance<AssetBundleBuildConfig>();
 
-            AssetDatabase.CreateAsset(asset, savePath);
+            AssetDatabase.CreateAsset(asset, "Assets/Resources/AssetBundleBuildConfig.asset");
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Selection.activeObject = asset;
+            EditorGUIUtility.PingObject(asset);
         }
         else
         {
-            for (int i = 0; i < guid.Length; i++)
-            {
-                if (AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GUIDToAssetPath(guid[i])) != typeof(AssetBundleBuildConfig))
-                    continue;
-                Debug.LogError("配置表已经存在：", AssetDatabase.LoadAssetAtPath<AssetBundleBuildConfig>(AssetDatabase.GUIDToAssetPath(guid[i])));
-            }
+            EditorGUIUtility.PingObject(config);
+            Debug.Log("资源管理 - 配置文件已经存在");
         }
     }
 }
