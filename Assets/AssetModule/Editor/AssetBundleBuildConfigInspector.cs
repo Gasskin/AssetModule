@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Xml.Serialization;
 using UnityEditor;
@@ -13,6 +14,9 @@ public class AssetBundleBuildConfigInspector : Editor
 {
 #region Field
     private AssetBundleBuildConfig script;
+
+    private SerializedProperty buildXML;
+    private SerializedProperty configName;
     
     private SerializedProperty targetPath;
     private SerializedProperty prefabs;
@@ -20,6 +24,15 @@ public class AssetBundleBuildConfigInspector : Editor
 
     private ReorderableList prefabList;
     private ReorderableList assetList;
+    
+    // 所有的文件夹AB包，key是包名，value是路径
+    private Dictionary<string, string> folderBundles = new Dictionary<string, string>();
+    // 所有单独打包的AB包
+    private Dictionary<string, List<string>> prefabBundles = new Dictionary<string, List<string>>();
+    // 过滤
+    private List<string> filter = new List<string>();
+    // XML的过滤
+    private List<string> xmlFilter = new List<string>();
 #endregion
 
 #region 生命周期
@@ -27,6 +40,8 @@ public class AssetBundleBuildConfigInspector : Editor
     {
         script = target as AssetBundleBuildConfig;
 
+        buildXML = serializedObject.FindProperty(nameof(AssetBundleBuildConfig.buildXML));
+        configName = serializedObject.FindProperty(nameof(AssetBundleBuildConfig.configName));
         targetPath = serializedObject.FindProperty(nameof(AssetBundleBuildConfig.targetPath));
         prefabs = serializedObject.FindProperty(nameof(AssetBundleBuildConfig.prefabList));
         assets = serializedObject.FindProperty(nameof(AssetBundleBuildConfig.assetList));
@@ -41,7 +56,7 @@ public class AssetBundleBuildConfigInspector : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-        TargetPath();
+        Draw();
         
         EditorGUILayout.Space();
         EditorGUILayout.Space();
@@ -91,15 +106,15 @@ public class AssetBundleBuildConfigInspector : Editor
         };
     }
 
-    private void TargetPath()
+    private void Draw()
     {
+        // AssetBundle的保存路径
         EditorGUILayout.BeginHorizontal();
-        
         GUI.enabled = false;
         EditorGUIUtility.labelWidth = 55f;
-        EditorGUILayout.TextField("保存路径：",targetPath.stringValue);
+        EditorGUILayout.TextField("保存路径",targetPath.stringValue);
         GUI.enabled = true;
-        if (GUILayout.Button("保存路径", GUILayout.Width(100))) 
+        if (GUILayout.Button("...", GUILayout.Width(100))) 
         {
             var tempPath = EditorUtility.OpenFolderPanel("保存路径", targetPath.stringValue, "");
             // 工程根目录
@@ -112,20 +127,24 @@ public class AssetBundleBuildConfigInspector : Editor
 
             targetPath.stringValue = tempPath.Substring(projectRoot.Length + 1);
         }
+        EditorGUILayout.EndHorizontal();
+
         
+        EditorGUILayout.Space();
+        EditorGUILayout.Space();
+        
+        // 是否生成XML，以及配置文件的名称
+        EditorGUILayout.BeginHorizontal();
+        EditorGUIUtility.labelWidth = 80f;
+        buildXML.boolValue = EditorGUILayout.Toggle("生成XML文件", buildXML.boolValue, GUILayout.Width(120f));
+        configName.stringValue = EditorGUILayout.TextField("配置文件名称", configName.stringValue);
+        EditorGUILayout.LabelField(".bytes",GUILayout.Width(40f));
         EditorGUILayout.EndHorizontal();
     }
 #endregion
 
 #region 打包
-    // 所有的文件夹AB包，key是包名，value是路径
-    private Dictionary<string, string> folderBundles = new Dictionary<string, string>();
-    // 所有单独打包的AB包
-    private Dictionary<string, List<string>> prefabBundles = new Dictionary<string, List<string>>();
-    // 过滤
-    private List<string> filter = new List<string>();
-    // XML的过滤
-    private List<string> xmlFilter = new List<string>();
+    
 
     private void Build()
     {
@@ -184,12 +203,15 @@ public class AssetBundleBuildConfigInspector : Editor
             foreach (var bundle in prefabBundles)
                 SetBundle(bundle.Key,bundle.Value);
 
-            BuildXML();
+            BuildConfig();
             BuildBundle();
+            
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
     }
 
-    private void BuildXML()
+    private void BuildConfig()
     {
         // 所有的BundleName
         var bundleNames = AssetDatabase.GetAllAssetBundleNames();
@@ -233,21 +255,40 @@ public class AssetBundleBuildConfigInspector : Editor
             config.bundleList.Add(asset);
         }
 
-        var xmlPath = Application.dataPath + "/" + "Resources/AssetBundleConfig.xml";
+        if (Directory.Exists(script.configPath))
+            Directory.CreateDirectory(script.configPath);
+
+        // XML
+        var xmlPath = $"{script.configPath}/{script.configName}.xml";
         if (File.Exists(xmlPath)) 
             File.Delete(xmlPath);
-        using (var stream = new FileStream(xmlPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+        if (buildXML.boolValue) 
         {
-            using (var writer = new StreamWriter(stream, Encoding.UTF8))
+            using (var stream = new FileStream(xmlPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
-                var xs = new XmlSerializer(typeof(AssetBundleConfig));
-                xs.Serialize(writer, config);
+                using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                {
+                    var xs = new XmlSerializer(typeof(AssetBundleConfig));
+                    xs.Serialize(writer, config);
+                }
             }
+        }
+        // bytes
+        var bytesPath = $"{script.configPath}/{script.configName}.bytes";
+        if (File.Exists(bytesPath)) 
+            File.Delete(bytesPath);
+        using (var stream = new FileStream(bytesPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+        {
+            var bf = new BinaryFormatter();
+            bf.Serialize(stream, config);
         }
     }
 
     private void BuildBundle()
     {
+        if (!Directory.Exists(script.targetPath))
+            Directory.CreateDirectory(script.targetPath);
+        
         BuildPipeline.BuildAssetBundles(script.targetPath, BuildAssetBundleOptions.None,
             BuildTarget.StandaloneWindows);
         AssetDatabase.SaveAssets();

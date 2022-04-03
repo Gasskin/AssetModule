@@ -3,6 +3,13 @@ using UnityEngine;
 
 public class AssetBundleBuildConfig : ScriptableObject
 {
+    // 是否生成XML文件（默认配置文件是bytes，xml用于debug）
+    public bool buildXML = true;
+    
+    // 配置文件的保存路径，以及配置文件的名称
+    public string configPath = "Assets/Resources";
+    public string configName = "AssetBundleConfig";
+    
     // 打包路径
     public string targetPath;
     
