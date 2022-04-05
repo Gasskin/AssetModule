@@ -112,8 +112,13 @@ public class AssetBundleManager : Singleton<AssetBundleManager>
         // 第一次加载这个Bundle
         else
         {
+            var path = $"{assetBundleBuildConfig.targetPath}/{bundleName}";
+        #if UNITY_EDITOR
+            var go = new GameObject($"{path}_1");
+            go.transform.SetParent(transform);
+        #endif
             loader = ReferenceManager.Instance.Acquire<AssetBundleLoader>();
-            loader.Load(Path.Combine(assetBundleBuildConfig.targetPath, bundleName));
+            loader.Load(path);
             assetBundleLoaders.Add(crc, loader);
         }
     }
@@ -139,3 +144,4 @@ public class AssetBundleManager : Singleton<AssetBundleManager>
     }
 #endregion
 }   
+

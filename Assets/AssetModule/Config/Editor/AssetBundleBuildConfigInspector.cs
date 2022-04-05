@@ -117,15 +117,17 @@ public class AssetBundleBuildConfigInspector : Editor
         if (GUILayout.Button("...", GUILayout.Width(100))) 
         {
             var tempPath = EditorUtility.OpenFolderPanel("保存路径", targetPath.stringValue, "");
-            // 工程根目录
-            var projectRoot = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf("/"));
-            if (!tempPath.Contains(projectRoot))
+            // 只能选择StreamingAsset下的目录
+            var streamingAssetsPath = Application.streamingAssetsPath;
+            if (!tempPath.Contains(streamingAssetsPath))
             {
                 Debug.LogError("保存路径必须位于项目路径以下");
+                targetPath.stringValue = "";
                 return;
             }
 
-            targetPath.stringValue = tempPath.Substring(projectRoot.Length + 1);
+            var index = tempPath.IndexOf("Assets");
+            targetPath.stringValue = tempPath.Substring(index);
         }
         EditorGUILayout.EndHorizontal();
 

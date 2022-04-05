@@ -24,11 +24,28 @@ public class AssetBundleLoader: IReference
 
     public void AddRef()
     {
+    #if UNITY_EDITOR
+        var go = GameObject.Find($"{path}_{refCount}");
+        if (go != null)
+        {
+            go.name = $"{path}_{refCount + 1}";
+        }
+    #endif
         refCount++;
     }
 
     public bool ReduceRef()
     {
+    #if UNITY_EDITOR
+        var go = GameObject.Find($"{path}_{refCount}");
+        if (go != null)
+        {
+            go.name = $"{path}_{refCount - 1}";
+            if (refCount - 1 <= 0)
+                Object.DestroyImmediate(go);
+        }
+    #endif
+        
         refCount--;
         if (refCount <= 0)
         {

@@ -15,7 +15,7 @@ MonoBehaviour:
   buildXML: 1
   configPath: Assets/Resources
   configName: AssetBundleConfig
-  targetPath: AssetBundles
+  targetPath: Assets/StreamingAssets/AssetBundles
   prefabList:
   - Assets/GameData/Prefab
   assetList:

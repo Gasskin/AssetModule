@@ -27,4 +27,4 @@ SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/GameData/Prefab/Sphere.prefab
 Dependencies:
-- D:/__Project/Unity/AssetModule/AssetBundles/materials
+- D:/__Project/Unity/AssetModule/Assets/StreamingAssets/AssetBundles/materials
