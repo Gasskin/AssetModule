@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class AssetBundleBuildConfig : ScriptableObject
 {
+    public const string buildConfigName = "AssetBundleBuildConfig";
+    
     // 是否生成XML文件（默认配置文件是bytes，xml用于debug）
     public bool buildXML = true;
     

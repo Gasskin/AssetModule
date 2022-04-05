@@ -259,7 +259,7 @@ public class AssetBundleBuildConfigInspector : Editor
             Directory.CreateDirectory(script.configPath);
 
         // XML
-        var xmlPath = $"{script.configPath}/{script.configName}.xml";
+        var xmlPath = $"{script.configPath}/{script.configName}XML.xml";
         if (File.Exists(xmlPath)) 
             File.Delete(xmlPath);
         if (buildXML.boolValue) 

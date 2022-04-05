@@ -7,7 +7,7 @@ public class CreateConfig
     [MenuItem("Assets/Create/AssetModule/Create Config")]
     private static void Create()
     {
-        var config = Resources.Load<AssetBundleBuildConfig>("AssetBundleBuildConfig");
+        var config = Resources.Load<AssetBundleBuildConfig>(AssetBundleBuildConfig.buildConfigName);
         // 说明没有配置表
         if (config == null)
         {
@@ -15,7 +15,7 @@ public class CreateConfig
                 Directory.CreateDirectory("Assets/Resources");
             var asset = ScriptableObject.CreateInstance<AssetBundleBuildConfig>();
 
-            AssetDatabase.CreateAsset(asset, "Assets/Resources/AssetBundleBuildConfig.asset");
+            AssetDatabase.CreateAsset(asset, $"Assets/Resources/{AssetBundleBuildConfig.buildConfigName}.asset");
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
