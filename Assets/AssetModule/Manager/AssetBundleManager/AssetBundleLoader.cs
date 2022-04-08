@@ -2,10 +2,13 @@
 
 public class AssetBundleLoader: IReference
 {
-    private AssetBundle assetBundle;
-    private int refCount;
-    private string path;
-    
+#region Property
+    public AssetBundle assetBundle { get; private set; }
+    public int refCount{ get; private set; }
+    public string path{ get; private set; }
+#endregion
+
+#region 加载资源
     public void Load(string path)
     {
         if (assetBundle != null) 
@@ -21,41 +24,23 @@ public class AssetBundleLoader: IReference
         this.path = path;
         refCount = 1;
     }
+#endregion
 
+#region 引用计数
     public void AddRef()
     {
-    #if UNITY_EDITOR
-        var go = GameObject.Find($"{path}_{refCount}");
-        if (go != null)
-        {
-            go.name = $"{path}_{refCount + 1}";
-        }
-    #endif
         refCount++;
     }
 
-    public bool ReduceRef()
+    public void ReduceRef()
     {
-    #if UNITY_EDITOR
-        var go = GameObject.Find($"{path}_{refCount}");
-        if (go != null)
-        {
-            go.name = $"{path}_{refCount - 1}";
-            if (refCount - 1 <= 0)
-                Object.DestroyImmediate(go);
-        }
-    #endif
-        
         refCount--;
-        if (refCount <= 0)
-        {
+        if (refCount <= 0) 
             assetBundle.Unload(true);
-            return true;
-        }
-
-        return false;
     }
-    
+#endregion
+
+#region 归还以及卸载
     public void Clear()
     {
         if (assetBundle != null) 
@@ -66,4 +51,5 @@ public class AssetBundleLoader: IReference
         refCount = 0;
         path = "";
     }
+#endregion
 }

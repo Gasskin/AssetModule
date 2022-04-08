@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: AssetBundleBuildConfig
   m_EditorClassIdentifier: 
   buildXML: 1
+  resourceMode: 1
   configPath: Assets/Resources
   configName: AssetBundleConfig
   targetPath: Assets/StreamingAssets/AssetBundles

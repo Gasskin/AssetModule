@@ -1,12 +1,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ResourceMode
+{
+    Editor,
+    Application,
+}
+
 public class AssetBundleBuildConfig : ScriptableObject
 {
     public const string buildConfigName = "AssetBundleBuildConfig";
     
     // 是否生成XML文件（默认配置文件是bytes，xml用于debug）
     public bool buildXML = true;
+
+    [SerializeField]
+    public ResourceMode resourceMode;
     
     // 配置文件的保存路径，以及配置文件的名称
     public string configPath = "Assets/Resources";

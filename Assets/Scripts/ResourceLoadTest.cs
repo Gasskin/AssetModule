@@ -6,13 +6,8 @@ public class ResourceLoadTest : MonoBehaviour
 {
     void Start()
     {
-        AssetBundleManager.Instance.LoadAssetBundles("Assets/GameData/Prefab/Cube.prefab");
+        var go = AssetManager.Instance.LoadAsset<GameObject>("Assets/GameData/Prefab/Cube.prefab");
+        Instantiate(go);
     }
 
-    private void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-        }
-    }
 }
