@@ -16,6 +16,9 @@ public class AssetBundleBuildConfig : ScriptableObject
 
     [SerializeField]
     public ResourceMode resourceMode;
+
+    // 资源垃圾池中每个资源可以存活的最大时间
+    public float aliveTime;
     
     // 配置文件的保存路径，以及配置文件的名称
     public string configPath = "Assets/Resources";

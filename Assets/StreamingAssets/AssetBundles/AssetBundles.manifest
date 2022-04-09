@@ -1,18 +1,21 @@
 ManifestFileVersion: 0
-CRC: 3340438871
+CRC: 2826571799
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
       Name: materials
       Dependencies: {}
     Info_1:
-      Name: attack
+      Name: sounds
       Dependencies: {}
     Info_2:
+      Name: attack
+      Dependencies: {}
+    Info_3:
       Name: cube
       Dependencies:
         Dependency_0: materials
-    Info_3:
+    Info_4:
       Name: sphere
       Dependencies:
         Dependency_0: materials

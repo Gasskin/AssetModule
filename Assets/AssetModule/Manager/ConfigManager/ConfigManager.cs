@@ -57,11 +57,6 @@ public class ConfigManager
         config = null;
         return false;
     }
-
-    public static void UnLoad()
-    {
-        Resources.UnloadAsset(assetBundleBuildConfig);
-    }
 }
 
 

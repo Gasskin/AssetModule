@@ -37,6 +37,23 @@ public class AssetBundleManager : Singleton<AssetBundleManager>
 
         return null;
     }
+
+    /// <summary>
+    /// 释放一个资源引用的所有Bundle
+    /// </summary>
+    /// <param name="crc">资源路径的crc</param>
+    public void UnLoadAssetBundles(uint crc)
+    {
+        if (ConfigManager.TryGetAssetConfig(crc, out var config)) 
+        {
+            // 卸载资源本身的Bundle
+            UnLoadAssetBundle(config.bundleName);
+
+            // 卸载所有依赖的Bundle
+            for (int i = 0; i < config.dependence.Count; i++)
+                UnLoadAssetBundle(config.dependence[i]);
+        }
+    }
     
 
     /// <summary>

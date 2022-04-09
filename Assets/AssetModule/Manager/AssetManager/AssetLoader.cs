@@ -12,16 +12,21 @@ public class AssetLoader: IComparable<AssetLoader>,IReference
 
     public int RefCount { get; private set; }
     
-    public uint Crc { get; private set; }
+    public uint CRC { get; private set; }
+    
+    public int GUID { get; private set; }
+    
+    public string AssetName { get; private set; }
 #endregion
 
-
 #region 加载资源
-    public void Init(Object asset,uint crc)
+    public void Init(Object asset,uint crc,string name)
     {
         RefCount = 1;
         Asset = asset;
-        Crc = crc;
+        CRC = crc;
+        AssetName = name;
+        GUID = asset.GetInstanceID();
         LastUsedTime = Time.realtimeSinceStartup;
     }
 #endregion
@@ -51,17 +56,16 @@ public class AssetLoader: IComparable<AssetLoader>,IReference
         if (ReferenceEquals(null, other)) 
             return 1;
         
-        var refComp = RefCount.CompareTo(other.RefCount);
-        if (refComp != 0) 
-            return refComp;
         return LastUsedTime.CompareTo(other.LastUsedTime);
     }
     
     public void Clear()
     {
         LastUsedTime = 0;
-        Crc = 0;
+        CRC = 0;
         RefCount = 0;
+        GUID = 0;
+        AssetName = "";
         Asset = null;
     }
 #endregion

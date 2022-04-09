@@ -16,6 +16,7 @@ public class AssetBundleBuildConfigInspector : Editor
     private AssetBundleBuildConfig script;
 
     private SerializedProperty resourceMode;
+    private SerializedProperty aliveTime;
 
     private SerializedProperty buildXML;
     private SerializedProperty configName;
@@ -43,6 +44,7 @@ public class AssetBundleBuildConfigInspector : Editor
         script = target as AssetBundleBuildConfig;
         
         resourceMode = serializedObject.FindProperty(nameof(AssetBundleBuildConfig.resourceMode));
+        aliveTime = serializedObject.FindProperty(nameof(AssetBundleBuildConfig.aliveTime));
         buildXML = serializedObject.FindProperty(nameof(AssetBundleBuildConfig.buildXML));
         configName = serializedObject.FindProperty(nameof(AssetBundleBuildConfig.configName));
         targetPath = serializedObject.FindProperty(nameof(AssetBundleBuildConfig.targetPath));
@@ -140,6 +142,13 @@ public class AssetBundleBuildConfigInspector : Editor
         
         // 真机模式
         resourceMode.enumValueIndex = EditorGUILayout.EnumPopup("资源模式", (ResourceMode)resourceMode.enumValueIndex).GetHashCode();
+        
+        EditorGUILayout.Space();
+        EditorGUILayout.Space();
+        
+        // 存活时间
+        EditorGUIUtility.labelWidth = 85f;
+        aliveTime.floatValue = EditorGUILayout.Slider("资源存活时间", aliveTime.floatValue, 0, 600);
         
         EditorGUILayout.Space();
         EditorGUILayout.Space();
