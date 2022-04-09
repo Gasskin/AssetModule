@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class AssetBundleManager : Singleton<AssetBundleManager>
@@ -80,6 +81,9 @@ public class AssetBundleManager : Singleton<AssetBundleManager>
         #if UNITY_EDITOR
             var go = new GameObject($"{bundleName}_1");
             go.transform.SetParent(transform);
+            var fileInfo = new FileInfo(path);
+            var size = go.AddComponent<AssetBundleSize>();
+            size.size = $"{fileInfo.Length / 1024f}KB";
         #endif
             loader = ReferenceManager.Instance.Acquire<AssetBundleLoader>();
             loader.Load(path);

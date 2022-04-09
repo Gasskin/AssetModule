@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 1431969435
+CRC: 1923382564
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: e70467514ee24a65f436fa44cc4ad2f0
+    Hash: a870e64ab5365ba9ad9484634966225e
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 7d1e0093d0592ca7550333bbf0c8f406
+    Hash: 7e4e81b586c36fda88ba73180982b3db
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -17,14 +17,19 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 23
   Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
 - Class: 33
   Script: {instanceID: 0}
 - Class: 43
+  Script: {instanceID: 0}
+- Class: 48
   Script: {instanceID: 0}
 - Class: 65
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
+- Assets/GameData/Materials/Wood texture floor_01.png
+- Assets/GameData/Materials/Wood texture floor_01.mat
 - Assets/GameData/Prefab/Cube.prefab
-Dependencies:
-- D:/__Project/Unity/AssetModule/Assets/StreamingAssets/AssetBundles/materials
+Dependencies: []

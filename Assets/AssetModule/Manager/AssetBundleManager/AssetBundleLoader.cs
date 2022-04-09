@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 
 public class AssetBundleLoader: IReference
 {
@@ -16,11 +17,9 @@ public class AssetBundleLoader: IReference
             Debug.LogError("没有释放资源");
             return;
         }
-        
         assetBundle = AssetBundle.LoadFromFile(path);
         if (assetBundle == null)
             Debug.LogError($"加载AssetBundle失败：{path}");
-        
         this.path = path;
         refCount = 1;
     }

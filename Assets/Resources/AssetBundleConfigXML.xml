@@ -5,59 +5,180 @@
       <crc>357436155</crc>
       <bundleName>attack</bundleName>
       <assetName>Attack.prefab</assetName>
+      <dependence>
+        <string>materials</string>
+        <string>benghuai</string>
+      </dependence>
+    </AssetConfig>
+    <AssetConfig>
+      <crc>1748301669</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>Attack.FBX</assetName>
+      <dependence>
+        <string>materials</string>
+      </dependence>
+    </AssetConfig>
+    <AssetConfig>
+      <crc>2514888993</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>Attack.max</assetName>
+      <dependence>
+        <string>materials</string>
+      </dependence>
+    </AssetConfig>
+    <AssetConfig>
+      <crc>2388404036</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>Avatar_Kiana_C1_Texture_Face_Color_Common.png</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>2182320417</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>Avatar_Kiana_C2_Texture_Body_Color_RGB2048.png</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>2960809432</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>Avatar_Kiana_C2_Texture_Hair_Color_Common.png</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>126288178</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>benghuai-body.FBX</assetName>
+      <dependence>
+        <string>materials</string>
+      </dependence>
+    </AssetConfig>
+    <AssetConfig>
+      <crc>1857913793</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>benghuai.shader</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>3713924772</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>cloud.shader</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>505431718</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>ID_312.bmp</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>1610114254</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>ID_362.bmp</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>906068160</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>ID_367.bmp</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>2349575378</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>ID_368.bmp</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>3305556831</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>ID_369.bmp</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>3603605164</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>ID_370.bmp</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>914024073</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>ID_401.bmp</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>4220377301</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>qq.FBX</assetName>
+      <dependence>
+        <string>materials</string>
+      </dependence>
+    </AssetConfig>
+    <AssetConfig>
+      <crc>3214154899</crc>
+      <bundleName>benghuai</bundleName>
+      <assetName>Weapon_Pistol_K9_62_2.png</assetName>
       <dependence />
     </AssetConfig>
     <AssetConfig>
       <crc>2584253997</crc>
       <bundleName>cube</bundleName>
       <assetName>Cube.prefab</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>2180688443</crc>
+      <bundleName>materials</bundleName>
+      <assetName>Avatar_Kiana_C1_Texture_Face_Color_Common.mat</assetName>
       <dependence>
-        <string>materials</string>
+        <string>benghuai</string>
       </dependence>
     </AssetConfig>
     <AssetConfig>
-      <crc>1203757269</crc>
+      <crc>853779896</crc>
       <bundleName>materials</bundleName>
-      <assetName>New Material.mat</assetName>
-      <dependence />
+      <assetName>Avatar_Kiana_C2_Texture_Body_Color_RGB2048.mat</assetName>
+      <dependence>
+        <string>benghuai</string>
+      </dependence>
     </AssetConfig>
     <AssetConfig>
-      <crc>1404619798</crc>
+      <crc>3218919591</crc>
       <bundleName>materials</bundleName>
-      <assetName>Wood texture floor_01.mat</assetName>
-      <dependence />
+      <assetName>Avatar_Kiana_C2_Texture_Hair_Color_Common.mat</assetName>
+      <dependence>
+        <string>benghuai</string>
+      </dependence>
     </AssetConfig>
     <AssetConfig>
-      <crc>3130572356</crc>
+      <crc>942627833</crc>
       <bundleName>materials</bundleName>
-      <assetName>Wood texture floor_01.png</assetName>
-      <dependence />
+      <assetName>default.mat</assetName>
+      <dependence>
+        <string>benghuai</string>
+      </dependence>
     </AssetConfig>
     <AssetConfig>
-      <crc>1636767443</crc>
+      <crc>149919265</crc>
       <bundleName>materials</bundleName>
-      <assetName>Wood texture floor_02.png</assetName>
-      <dependence />
+      <assetName>No Name.mat</assetName>
+      <dependence>
+        <string>benghuai</string>
+      </dependence>
     </AssetConfig>
     <AssetConfig>
-      <crc>2729331572</crc>
-      <bundleName>sounds</bundleName>
-      <assetName>menusound.mp3</assetName>
-      <dependence />
-    </AssetConfig>
-    <AssetConfig>
-      <crc>3022988390</crc>
-      <bundleName>sounds</bundleName>
-      <assetName>senlin.mp3</assetName>
-      <dependence />
+      <crc>3367366523</crc>
+      <bundleName>materials</bundleName>
+      <assetName>Weapon_Pistol_K9_62_2.mat</assetName>
+      <dependence>
+        <string>benghuai</string>
+      </dependence>
     </AssetConfig>
     <AssetConfig>
       <crc>462316337</crc>
       <bundleName>sphere</bundleName>
       <assetName>Sphere.prefab</assetName>
-      <dependence>
-        <string>materials</string>
-      </dependence>
+      <dependence />
     </AssetConfig>
   </bundleList>
 </AssetBundleConfig>

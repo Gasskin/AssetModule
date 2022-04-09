@@ -140,7 +140,7 @@ public class AssetManager : Singleton<AssetManager>
         }
     }
 
-
+#if UNITY_EDITOR
     /// <summary>
     /// 编辑器下加载一个资源
     /// </summary>
@@ -177,6 +177,7 @@ public class AssetManager : Singleton<AssetManager>
 
         return assetLoader.Asset as T;
     }
+#endif
 
     /// <summary>
     /// 尝试从缓存中获取资源

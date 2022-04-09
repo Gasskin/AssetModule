@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildXML: 1
   resourceMode: 1
-  aliveTime: 5
+  aliveTime: 0
   configPath: Assets/Resources
   configName: AssetBundleConfig
   targetPath: Assets/StreamingAssets/AssetBundles
   prefabList:
   - Assets/GameData/Prefab
   assetList:
-  - Assets/GameData/Materials
-  - Assets/GameData/Sounds
+  - Assets/GameData/Modle/benghuai
+  - Assets/GameData/Modle/benghuai/Materials

@@ -4,22 +4,16 @@ using UnityEngine;
 
 public class ResourceLoadTest : MonoBehaviour
 {
-    private AudioClip go;
-
-
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            go = AssetManager.Instance.LoadAsset<AudioClip>("Assets/GameData/Sounds/senlin.mp3");
-            var audio = GetComponent<AudioSource>();
-            audio.clip = go;
-            audio.Play();
+            var go = AssetManager.Instance.LoadAsset<GameObject>("Assets/GameData/Prefab/Attack.prefab");
+            Instantiate(go);
         }
         
         if (Input.GetMouseButtonDown(1))
         {
-            AssetManager.Instance.UnLoadAsset(go);
         }
     }
 }

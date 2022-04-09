@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1761080262
+CRC: 1771325339
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 5b9a88bd4877a51356f6ee88e7bb9282
+    Hash: e8c0d5ebec2d75d49d80164f6d6e991d
   TypeTreeHash:
     serializedVersion: 2
     Hash: 939e20ecac0e95a3f7c5cfb3e57acb1d
@@ -17,8 +17,11 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/GameData/Materials/New Material.mat
-- Assets/GameData/Materials/Wood texture floor_01.png
-- Assets/GameData/Materials/Wood texture floor_01.mat
-- Assets/GameData/Materials/Wood texture floor_02.png
-Dependencies: []
+- Assets/GameData/Modle/benghuai/Materials/Avatar_Kiana_C2_Texture_Body_Color_RGB2048.mat
+- Assets/GameData/Modle/benghuai/Materials/default.mat
+- Assets/GameData/Modle/benghuai/Materials/Weapon_Pistol_K9_62_2.mat
+- Assets/GameData/Modle/benghuai/Materials/Avatar_Kiana_C1_Texture_Face_Color_Common.mat
+- Assets/GameData/Modle/benghuai/Materials/Avatar_Kiana_C2_Texture_Hair_Color_Common.mat
+- Assets/GameData/Modle/benghuai/Materials/No Name.mat
+Dependencies:
+- D:/__Project/Unity/AssetModule/Assets/StreamingAssets/AssetBundles/benghuai
