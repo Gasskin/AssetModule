@@ -25,8 +25,17 @@ public class AssetBundleManager : Singleton<AssetBundleManager>
     /// <param name="path">资源全路径，带后缀</param>
     public AssetBundleLoader LoadAssetBundles(string path)
     {
-        var crc32 = CRC32.GetCRC32(path);
-        if (ConfigManager.TryGetAssetConfig(crc32, out var config)) 
+        var crc = CRC32.GetCRC32(path);
+        return LoadAssetBundles(crc);
+    }
+    
+    /// <summary>
+    /// 加载资源所需Bundle,包括依赖
+    /// </summary>
+    /// <param name="crc">资源全路径CRC</param>
+    public AssetBundleLoader LoadAssetBundles(uint crc)
+    {
+        if (ConfigManager.TryGetAssetConfig(crc, out var config)) 
         {
             // 加载所有依赖的Bundle
             for (int i = 0; i < config.dependence.Count; i++)

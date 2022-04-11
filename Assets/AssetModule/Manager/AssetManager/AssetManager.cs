@@ -1,12 +1,23 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class AssetManager : Singleton<AssetManager>
 {
 #region Field
+    // 所有正在使用的资源
     private Dictionary<uint, AssetLoader> assets;
+    // 不在使用的资源
     private List<AssetLoader> assetGarbage;
+    // 异步加载队列
+    private Dictionary<int, Queue<AsyncLoadTask<Object>>> asyncLoadQueue;
+#endregion
+
+#region Event
+    public Action<string, Object> assetAsyncLoaded;
 #endregion
 
 #region 生命周期
@@ -20,6 +31,9 @@ public class AssetManager : Singleton<AssetManager>
     {
         assets = new Dictionary<uint, AssetLoader>();
         assetGarbage = new List<AssetLoader>();
+        asyncLoadQueue = new Dictionary<int, Queue<AsyncLoadTask<Object>>>();
+
+        StartCoroutine(AsyncLoadCoroutine());
     }
 
     private void Update()
@@ -178,7 +192,73 @@ public class AssetManager : Singleton<AssetManager>
         return assetLoader.Asset as T;
     }
 #endif
+#endregion
 
+#region 资源的异步加载
+    /// <summary>
+    /// 异步加载资源的协程
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator AsyncLoadCoroutine()
+    {
+        yield break;
+    }
+
+    /// <summary>
+    /// 异步加载资源
+    /// </summary>
+    /// <param name="path">资源路径</param>
+    /// <param name="priority">优先级（越高越优先）</param>
+    /// <param name="callBack">回调</param>
+    private void LoadAssetAsync<T>(string path, int priority, Action<Object> callBack)where T : Object
+    {
+        var crc = CRC32.GetCRC32(path);
+        LoadAssetAsync<T>(crc, priority, callBack);
+    }
+    
+    /// <summary>
+    /// 异步加载资源
+    /// </summary>
+    /// <param name="crc">资源路径CRC</param>
+    /// <param name="priority">优先级（越高越优先）</param>
+    /// <param name="callBack">回调</param>
+    private void LoadAssetAsync<T>(uint crc, int priority, Action<Object> callBack) where T : Object
+    {
+        if (TryGetAssetFromGarbage(crc, out var loader)) 
+        {
+            callBack?.Invoke(loader.Asset as T);
+            return;
+        }
+
+        if (TryGetAsset(crc,out loader))
+        {
+            callBack?.Invoke(loader.Asset as T);
+            return;
+        }
+        
+        AddAsyncTask(crc,priority,callBack);
+    }
+
+    private void AddAsyncTask(uint crc,int priority,Action<Object> callBack)
+    {
+        var task = ReferenceManager.Instance.Acquire<AsyncLoadTask<Object>>();
+        task.crc = crc;
+        task.callback = callBack;
+        
+        if (asyncLoadQueue.TryGetValue(priority, out var queue))
+        {
+            queue.Enqueue(task);
+        }
+        else
+        {
+            queue = new Queue<AsyncLoadTask<Object>>();
+            queue.Enqueue(task);
+            asyncLoadQueue.Add(priority, queue);
+        }
+    }
+#endregion
+
+#region 工具方法
     /// <summary>
     /// 尝试从缓存中获取资源
     /// </summary>
@@ -188,7 +268,17 @@ public class AssetManager : Singleton<AssetManager>
     private bool TryGetAsset(string path, out AssetLoader assetLoader)
     {
         var crc = CRC32.GetCRC32(path);
-        
+        return TryGetAsset(crc, out assetLoader);
+    }
+    
+    /// <summary>
+    /// 尝试从缓存中获取资源
+    /// </summary>
+    /// <param name="crc">资源全路径</param>
+    /// <param name="assetLoader">返回的资源结构</param>
+    /// <returns>是否成功</returns>
+    private bool TryGetAsset(uint crc, out AssetLoader assetLoader)
+    {
         if (assets.TryGetValue(crc,out assetLoader))
         {
         #if UNITY_EDITOR
@@ -212,7 +302,17 @@ public class AssetManager : Singleton<AssetManager>
     private bool TryGetAssetFromGarbage(string path, out AssetLoader assetLoader)
     {
         var crc = CRC32.GetCRC32(path);
-        
+        return TryGetAssetFromGarbage(crc, out assetLoader);
+    }
+    
+    /// <summary>
+    /// 尝试中垃圾池中获取资源
+    /// </summary>
+    /// <param name="crc">资源全路径CRC</param>
+    /// <param name="assetLoader">返回的资源结构</param>
+    /// <returns>是否成功</returns>
+    private bool TryGetAssetFromGarbage(uint crc, out AssetLoader assetLoader)
+    {
         for (int i = 0; i < assetGarbage.Count; i++)
         {
             if (assetGarbage[i].CRC == crc)
@@ -244,8 +344,17 @@ public class AssetManager : Singleton<AssetManager>
     private T LoadNewAsset<T>(string path) where T : Object
     {
         var crc = CRC32.GetCRC32(path);
-
-        var bundle = AssetBundleManager.Instance.LoadAssetBundles(path);
+        return LoadNewAsset<T>(crc);
+    }
+    
+    /// <summary>
+    /// 加载一个新的资源，以及他的所有Bundle
+    /// </summary>
+    /// <param name="crc">资源全路径CRC</param>
+    /// <returns></returns>
+    private T LoadNewAsset<T>(uint crc) where T : Object
+    {
+        var bundle = AssetBundleManager.Instance.LoadAssetBundles(crc);
         if (bundle != null)
         {
             if (ConfigManager.TryGetAssetConfig(crc, out var config))
