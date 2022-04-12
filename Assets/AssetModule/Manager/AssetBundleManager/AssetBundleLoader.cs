@@ -10,7 +10,7 @@ public class AssetBundleLoader: IReference
 #endregion
 
 #region 加载资源
-    public void Load(string path)
+    public void Load(string path, int count = 1)
     {
         if (assetBundle != null) 
         {
@@ -21,19 +21,19 @@ public class AssetBundleLoader: IReference
         if (assetBundle == null)
             Debug.LogError($"加载AssetBundle失败：{path}");
         this.path = path;
-        refCount = 1;
+        refCount = count;
     }
 #endregion
 
 #region 引用计数
-    public void AddRef()
+    public void AddRef(int count = 1)
     {
-        refCount++;
+        refCount += count;
     }
 
-    public void ReduceRef()
+    public void ReduceRef(int count = 1)
     {
-        refCount--;
+        refCount -= count;
         if (refCount <= 0) 
             assetBundle.Unload(true);
     }

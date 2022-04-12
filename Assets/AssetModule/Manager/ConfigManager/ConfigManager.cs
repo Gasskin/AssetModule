@@ -5,7 +5,7 @@ using UnityEngine;
 public class ConfigManager
 {
     /// 打包配置文件，存放了Bundle配置文件的名称，以及打包后的Bundle路径
-    public static AssetBundleBuildConfig assetBundleBuildConfig { get;private set;}
+    public static AssetModuleConfig assetModuleConfig { get;private set;}
 
     /// Bundle配置文件，存放了Bundle的所有信息
     public static AssetBundleConfig assetBundleConfig { get; private set; }
@@ -16,17 +16,17 @@ public class ConfigManager
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void Init()
     {
-        assetBundleBuildConfig = Resources.Load<AssetBundleBuildConfig>(AssetBundleBuildConfig.buildConfigName);
-        if (assetBundleBuildConfig == null)
+        assetModuleConfig = Resources.Load<AssetModuleConfig>(AssetModuleConfig.buildConfigName);
+        if (assetModuleConfig == null)
         {
-            Debug.LogError($"Resources目录下不存在：{AssetBundleBuildConfig.buildConfigName}");
+            Debug.LogError($"Resources目录下不存在：{AssetModuleConfig.buildConfigName}");
             return;
         }
 
-        var configBytes = Resources.Load<TextAsset>($"{assetBundleBuildConfig.configName}");
+        var configBytes = Resources.Load<TextAsset>($"{assetModuleConfig.configName}");
         if (configBytes == null)
         {
-            Debug.LogError($"加载AssetBundle配置文件失败：{assetBundleBuildConfig.configName}");
+            Debug.LogError($"加载AssetBundle配置文件失败：{assetModuleConfig.configName}");
             return;
         }
 

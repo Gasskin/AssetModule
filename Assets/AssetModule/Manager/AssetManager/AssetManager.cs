@@ -13,7 +13,10 @@ public class AssetManager : Singleton<AssetManager>
     // 不在使用的资源
     private List<AssetLoader> assetGarbage;
     // 异步加载队列
-    private Dictionary<int, Queue<AsyncLoadTask<Object>>> asyncLoadQueue;
+    private Dictionary<int, Queue<AsyncLoadTask>> asyncLoadQueue;
+    // 进行中的任务
+    private Dictionary<uint, AsyncLoadTask> asyncLoadTask;
+
 #endregion
 
 #region Event
@@ -31,8 +34,9 @@ public class AssetManager : Singleton<AssetManager>
     {
         assets = new Dictionary<uint, AssetLoader>();
         assetGarbage = new List<AssetLoader>();
-        asyncLoadQueue = new Dictionary<int, Queue<AsyncLoadTask<Object>>>();
-
+        asyncLoadQueue = new Dictionary<int, Queue<AsyncLoadTask>>();
+        asyncLoadTask = new Dictionary<uint, AsyncLoadTask>();
+        
         StartCoroutine(AsyncLoadCoroutine());
     }
 
@@ -42,7 +46,7 @@ public class AssetManager : Singleton<AssetManager>
         for (int i = assetGarbage.Count - 1; i >= 0; i--) 
         {
             var asset = assetGarbage[i];
-            if (realTime - asset.LastUsedTime >= ConfigManager.assetBundleBuildConfig.aliveTime) 
+            if (realTime - asset.LastUsedTime >= ConfigManager.assetModuleConfig.aliveTime) 
             {
             #if UNITY_EDITOR
                 var trans = transform.Find($"{asset.AssetName}_0");
@@ -52,7 +56,7 @@ public class AssetManager : Singleton<AssetManager>
                 assetGarbage.RemoveAt(i);
 
             #if UNITY_EDITOR
-                if (ConfigManager.assetBundleBuildConfig.resourceMode == ResourceMode.Editor) 
+                if (ConfigManager.assetModuleConfig.resourceMode == ResourceMode.Editor) 
                 {
                     Resources.UnloadAsset(asset.Asset);
                     ReferenceManager.Instance.Release(asset);
@@ -80,7 +84,7 @@ public class AssetManager : Singleton<AssetManager>
         if (string.IsNullOrEmpty(path))
             return null;
     #if UNITY_EDITOR
-        if (ConfigManager.assetBundleBuildConfig.resourceMode == ResourceMode.Editor)
+        if (ConfigManager.assetModuleConfig.resourceMode == ResourceMode.Editor)
         {
             return LoadAssetEditor<T>(path);
         }
@@ -111,7 +115,7 @@ public class AssetManager : Singleton<AssetManager>
                 go.name = $"{loader.AssetName}_{loader.RefCount - 1}";
                 if (loader.RefCount <= 1) 
                 {
-                    if (ConfigManager.assetBundleBuildConfig.aliveTime <= 0)
+                    if (ConfigManager.assetModuleConfig.aliveTime <= 0)
                     {
                         DestroyImmediate(go);
                     }
@@ -126,11 +130,11 @@ public class AssetManager : Singleton<AssetManager>
                 if (loader.RefCount <= 0)
                 {
                     // 直接释放，否则垃圾垃圾池，等待释放
-                    if (ConfigManager.assetBundleBuildConfig.aliveTime <= 0)
+                    if (ConfigManager.assetModuleConfig.aliveTime <= 0)
                     {
                         assets.Remove(loader.CRC);
                     #if UNITY_EDITOR
-                        if (ConfigManager.assetBundleBuildConfig.resourceMode == ResourceMode.Editor)
+                        if (ConfigManager.assetModuleConfig.resourceMode == ResourceMode.Editor)
                         {
                             Resources.UnloadAsset(loader.Asset);
                             ReferenceManager.Instance.Release(loader);
@@ -201,7 +205,64 @@ public class AssetManager : Singleton<AssetManager>
     /// <returns></returns>
     private IEnumerator AsyncLoadCoroutine()
     {
-        yield break;
+        var time = Time.realtimeSinceStartup;
+        while (true)
+        {
+            // 遍历所有优先级队列
+            foreach (var queue in asyncLoadQueue.Values)
+            {
+                // 对每一个队列里的任务进行加载
+                while (queue.Count > 0)
+                {
+                    Object asset = null;
+                    var task = queue.Dequeue();
+                #if UNITY_EDITOR
+                    if (ConfigManager.assetModuleConfig.resourceMode == ResourceMode.Editor)
+                    {
+                        asset = LoadAssetEditor<Object>(task.path);
+                    }
+                    else
+                #endif
+                    {
+                        var count = task.callback.GetInvocationList().Length;
+                        var bundle = AssetBundleManager.Instance.LoadAssetBundles(task.crc, count);
+                        if (bundle != null)
+                        {
+                            if (ConfigManager.TryGetAssetConfig(task.crc, out var config))
+                            {
+                            #if UNITY_EDITOR
+                                var go = new GameObject($"{config.assetName}_{count}");
+                                go.transform.SetParent(transform);
+                            #endif
+                                var request = bundle.assetBundle.LoadAssetAsync<Object>(config.assetName);
+                                yield return request;
+                                if (request.isDone)
+                                {
+                                    asset = request.asset;
+                                    
+                                    var loader = ReferenceManager.Instance.Acquire<AssetLoader>();
+                                    loader.Init(asset, task.crc, config.assetName);
+                                    assets.Add(task.crc, loader);
+                                }
+                            }
+                        }
+                    }
+
+                    task.callback?.Invoke(asset);
+                    asyncLoadTask.Remove(task.crc);
+                    ReferenceManager.Instance.Release(task);
+
+                    // 当这一帧的加载时间已经超过限制时，等待下一帧
+                    var now = Time.realtimeSinceStartup;
+                    if (now - time >= ConfigManager.assetModuleConfig.asyncTimeLimit / 1000f)
+                    {
+                        time = now;
+                        yield return null;
+                    }
+                }
+            }
+            yield return null;
+        }
     }
 
     /// <summary>
@@ -210,40 +271,61 @@ public class AssetManager : Singleton<AssetManager>
     /// <param name="path">资源路径</param>
     /// <param name="priority">优先级（越高越优先）</param>
     /// <param name="callBack">回调</param>
-    private void LoadAssetAsync<T>(string path, int priority, Action<Object> callBack)where T : Object
+    public void LoadAssetAsync(string path, int priority, Action<Object> callBack)
     {
         var crc = CRC32.GetCRC32(path);
-        LoadAssetAsync<T>(crc, priority, callBack);
+        if (!TryLoadAssetAsync(crc, priority, callBack))
+            AddAsyncTask(path, priority, callBack);
     }
     
     /// <summary>
-    /// 异步加载资源
+    /// 尝试获取异步加载的资源
     /// </summary>
     /// <param name="crc">资源路径CRC</param>
     /// <param name="priority">优先级（越高越优先）</param>
     /// <param name="callBack">回调</param>
-    private void LoadAssetAsync<T>(uint crc, int priority, Action<Object> callBack) where T : Object
+    private bool TryLoadAssetAsync(uint crc, int priority, Action<Object> callBack)
     {
+        // 垃圾池里是否存在资源
         if (TryGetAssetFromGarbage(crc, out var loader)) 
         {
-            callBack?.Invoke(loader.Asset as T);
-            return;
+            callBack?.Invoke(loader.Asset);
+            return true;
         }
 
+        // 资源池里是否存在资源
         if (TryGetAsset(crc,out loader))
         {
-            callBack?.Invoke(loader.Asset as T);
-            return;
+            callBack?.Invoke(loader.Asset);
+            return true;
         }
         
-        AddAsyncTask(crc,priority,callBack);
+        // 是否已经在任务队列
+        if (asyncLoadTask.TryGetValue(crc, out var task))
+        {
+            task.callback += callBack;
+            return true;
+        }
+
+        return false;
     }
 
-    private void AddAsyncTask(uint crc,int priority,Action<Object> callBack)
+    /// <summary>
+    /// 添加一个新的异步加载任务
+    /// </summary>
+    /// <param name="path">资源路径</param>
+    /// <param name="priority">资源优先级</param>
+    /// <param name="callBack">回调</param>
+    private void AddAsyncTask(string path,int priority,Action<Object> callBack)
     {
-        var task = ReferenceManager.Instance.Acquire<AsyncLoadTask<Object>>();
+        var crc = CRC32.GetCRC32(path);
+        
+        var task = ReferenceManager.Instance.Acquire<AsyncLoadTask>();
+        task.path = path;
         task.crc = crc;
         task.callback = callBack;
+
+        asyncLoadTask.Add(crc, task);
         
         if (asyncLoadQueue.TryGetValue(priority, out var queue))
         {
@@ -251,7 +333,7 @@ public class AssetManager : Singleton<AssetManager>
         }
         else
         {
-            queue = new Queue<AsyncLoadTask<Object>>();
+            queue = new Queue<AsyncLoadTask>();
             queue.Enqueue(task);
             asyncLoadQueue.Add(priority, queue);
         }

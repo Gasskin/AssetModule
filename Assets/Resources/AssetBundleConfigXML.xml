@@ -175,6 +175,18 @@
       </dependence>
     </AssetConfig>
     <AssetConfig>
+      <crc>2729331572</crc>
+      <bundleName>sounds</bundleName>
+      <assetName>menusound.mp3</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
+      <crc>3022988390</crc>
+      <bundleName>sounds</bundleName>
+      <assetName>senlin.mp3</assetName>
+      <dependence />
+    </AssetConfig>
+    <AssetConfig>
       <crc>462316337</crc>
       <bundleName>sphere</bundleName>
       <assetName>Sphere.prefab</assetName>

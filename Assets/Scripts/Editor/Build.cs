@@ -17,9 +17,9 @@ public class Build
         {
             for (int i = 0; i < guid.Length; i++)
             {
-                if (AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GUIDToAssetPath(guid[i])) != typeof(AssetBundleBuildConfig))
+                if (AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GUIDToAssetPath(guid[i])) != typeof(AssetModuleConfig))
                     continue;
-                var asset = AssetDatabase.LoadAssetAtPath<AssetBundleBuildConfig>(AssetDatabase.GUIDToAssetPath(guid[i]));
+                var asset = AssetDatabase.LoadAssetAtPath<AssetModuleConfig>(AssetDatabase.GUIDToAssetPath(guid[i]));
 
                 foreach (var path in asset.prefabList)
                 {
